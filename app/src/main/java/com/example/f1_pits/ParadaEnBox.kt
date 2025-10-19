@@ -10,16 +10,19 @@ data class ParadaEnBox(
     val neumaticosCambiados: Int,
     val estado: EstadoParada,
     val motivoFallo: String?,
-    val fechaHora: String
+    val fechaHora: String,
+    val mecanicoPrincipal: String
 )
 
 enum class TipoNeumatico(val displayName: String) {
-    BLANDO("Blandos"), 
-    MEDIO("Medios"), 
-    DURO("Duros")
+    BLANDO("Blandos"),
+    MEDIO("Medios"),
+    DURO("Duros"),
+    INTERMEDIO("Intermedios"),
+    LLUVIA("Lluvia")
 }
 
 enum class EstadoParada(val displayName: String) {
-    OK("OK"), 
+    OK("OK"),
     FALLIDO("Fallido")
 }

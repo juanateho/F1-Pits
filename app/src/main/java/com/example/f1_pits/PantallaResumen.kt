@@ -14,11 +14,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.example.f1_pits.ui.theme.F1PitsTheme
+
 
 @Composable
 fun PantallaResumenPitStop(
@@ -51,18 +49,5 @@ fun PantallaResumenPitStop(
                 Text(text = "Ver Pit Stops")
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PantallaResumenPitStopPreview() {
-    F1PitsTheme {
-        PantallaResumenPitStop(
-            navController = rememberNavController(),
-            totalPits = 10,
-            fastestPit = 2.5,
-            averageTime = 3.2
-        )
     }
 }
