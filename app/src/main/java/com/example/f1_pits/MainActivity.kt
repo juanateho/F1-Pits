@@ -7,9 +7,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,19 +37,50 @@ fun AppNavigation() {
 
     NavHost(navController = navController, startDestination = "resumen") {
         composable("resumen") {
-            PantallaResumenPitStop(navController = navController)
+            val totalPits = paradasEnBox.value.size
+            val fastestPit = paradasEnBox.value.minOfOrNull { it.tiempoPit }
+            val averageTime = paradasEnBox.value.map { it.tiempoPit }.average()
+
+            PantallaResumenPitStop(
+                navController = navController,
+                totalPits = totalPits,
+                fastestPit = fastestPit,
+                averageTime = if (averageTime.isNaN()) 0.0 else averageTime
+            )
         }
-        composable("lista") {
-            PantallaListaPitStop(onAddPitStop = { nuevaParada ->
-                val paradaConId = nuevaParada.copy(id = (paradasEnBox.value.maxOfOrNull { it.id } ?: 0) + 1)
-                paradasEnBox.value = paradasEnBox.value + paradaConId
-                navController.navigate("registro") {
-                    popUpTo("lista") { inclusive = true }
-                }
+        composable(
+            "lista?pitStopId={pitStopId}",
+            arguments = listOf(navArgument("pitStopId") { 
+                type = NavType.StringType
+                nullable = true
             })
+        ) { backStackEntry ->
+            val pitStopId = backStackEntry.arguments?.getString("pitStopId")?.toIntOrNull()
+            val paradaAEditar = paradasEnBox.value.find { it.id == pitStopId }
+
+            PantallaListaPitStop(
+                paradaAEditar = paradaAEditar,
+                onSavePitStop = { parada ->
+                    if (paradaAEditar == null) { // Creando
+                        val paradaConId = parada.copy(id = (paradasEnBox.value.maxOfOrNull { it.id } ?: 0) + 1)
+                        paradasEnBox.value = paradasEnBox.value + paradaConId
+                    } else { // Editando
+                        paradasEnBox.value = paradasEnBox.value.map { if (it.id == parada.id) parada else it }
+                    }
+                    navController.popBackStack()
+                }
+            )
         }
         composable("registro") {
-            PantallaRegistroPitStop(paradas = paradasEnBox.value)
+            PantallaRegistroPitStop(
+                paradas = paradasEnBox.value,
+                onEditPitStop = { pitStopId ->
+                    navController.navigate("lista?pitStopId=$pitStopId")
+                },
+                onDeletePitStop = { pitStopId ->
+                    paradasEnBox.value = paradasEnBox.value.filter { it.id != pitStopId }
+                }
+            )
         }
     }
 }

@@ -21,7 +21,12 @@ import androidx.navigation.compose.rememberNavController
 import com.example.f1_pits.ui.theme.F1PitsTheme
 
 @Composable
-fun PantallaResumenPitStop(navController: NavController) {
+fun PantallaResumenPitStop(
+    navController: NavController,
+    totalPits: Int,
+    fastestPit: Double?,
+    averageTime: Double
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -31,9 +36,9 @@ fun PantallaResumenPitStop(navController: NavController) {
     ) {
         Text(text = "Resumen de Pit Stops")
         Spacer(modifier = Modifier.height(16.dp))
-        Text(text = "Pit Stop más rápido: 2.5s")
-        Text(text = "Tiempo promedio de Pit Stop: 3.2s")
-        Text(text = "Total de Pit Stops: 10")
+        Text(text = "Pit Stop más rápido: ${fastestPit?.let { "${it}s" } ?: "N/A"}")
+        Text(text = "Tiempo promedio de Pit Stop: ${if (averageTime > 0) "%.2fs".format(averageTime) else "N/A"}")
+        Text(text = "Total de Pit Stops: $totalPits")
         Spacer(modifier = Modifier.height(32.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -53,6 +58,11 @@ fun PantallaResumenPitStop(navController: NavController) {
 @Composable
 fun PantallaResumenPitStopPreview() {
     F1PitsTheme {
-        PantallaResumenPitStop(navController = rememberNavController())
+        PantallaResumenPitStop(
+            navController = rememberNavController(),
+            totalPits = 10,
+            fastestPit = 2.5,
+            averageTime = 3.2
+        )
     }
 }

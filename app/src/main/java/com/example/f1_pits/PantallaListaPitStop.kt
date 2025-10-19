@@ -9,6 +9,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,7 +22,10 @@ import java.util.Date
 import java.util.Locale
 
 @Composable
-fun PantallaListaPitStop(onAddPitStop: (ParadaEnBox) -> Unit) {
+fun PantallaListaPitStop(
+    paradaAEditar: ParadaEnBox?,
+    onSavePitStop: (ParadaEnBox) -> Unit
+) {
     var nombrePiloto by remember { mutableStateOf("") }
     var equipo by remember { mutableStateOf("") }
     var tiempoPit by remember { mutableStateOf("") }
@@ -29,6 +33,18 @@ fun PantallaListaPitStop(onAddPitStop: (ParadaEnBox) -> Unit) {
     var neumaticosCambiados by remember { mutableStateOf("") }
     var estado by remember { mutableStateOf(EstadoParada.OK) }
     var motivoFallo by remember { mutableStateOf("") }
+
+    LaunchedEffect(paradaAEditar) {
+        if (paradaAEditar != null) {
+            nombrePiloto = paradaAEditar.nombrePiloto
+            equipo = paradaAEditar.equipo
+            tiempoPit = paradaAEditar.tiempoPit.toString()
+            neumaticos = paradaAEditar.neumaticos
+            neumaticosCambiados = paradaAEditar.neumaticosCambiados.toString()
+            estado = paradaAEditar.estado
+            motivoFallo = paradaAEditar.motivoFallo ?: ""
+        }
+    }
 
     Column(modifier = Modifier.padding(16.dp)) {
         TextField(value = nombrePiloto, onValueChange = { nombrePiloto = it }, label = { Text("Nombre del Piloto") })
@@ -61,8 +77,7 @@ fun PantallaListaPitStop(onAddPitStop: (ParadaEnBox) -> Unit) {
         }
 
         Button(onClick = {
-            val nuevaParadaEnBox = ParadaEnBox(
-                id = 0, // El ID se gestionará en la capa de datos
+            val paradaGuardada = (paradaAEditar ?: ParadaEnBox(0, "", "", 0.0, TipoNeumatico.BLANDO, 0, EstadoParada.OK, null, "")).copy(
                 nombrePiloto = nombrePiloto,
                 equipo = equipo,
                 tiempoPit = tiempoPit.toDoubleOrNull() ?: 0.0,
@@ -70,11 +85,11 @@ fun PantallaListaPitStop(onAddPitStop: (ParadaEnBox) -> Unit) {
                 neumaticosCambiados = neumaticosCambiados.toIntOrNull() ?: 0,
                 estado = estado,
                 motivoFallo = if (estado == EstadoParada.FALLIDO) motivoFallo else null,
-                fechaHora = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+                fechaHora = paradaAEditar?.fechaHora ?: SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
             )
-            onAddPitStop(nuevaParadaEnBox)
+            onSavePitStop(paradaGuardada)
         }) {
-            Text("Registrar Pit Stop")
+            Text(if (paradaAEditar == null) "Registrar Pit Stop" else "Actualizar Pit Stop")
         }
     }
 }
