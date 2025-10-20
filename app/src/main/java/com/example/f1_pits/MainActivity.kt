@@ -26,14 +26,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
-    val paradasEnBox = remember {
-        mutableStateOf(
-            listOf(
-                ParadaEnBox(1, "Lando Norris", "McLaren", 1.8, TipoNeumatico.BLANDO, 4, EstadoParada.OK, null, "2024-01-01 12:00:00", "Mecanico 1"),
-                ParadaEnBox(2, "Max Verstappen", "Red Bull", 2.1, TipoNeumatico.MEDIO, 4, EstadoParada.OK, null, "2024-01-01 12:05:00", "Mecanico 2")
-            )
-        )
-    }
+    val paradasEnBox = remember { mutableStateOf(emptyList<ParadaEnBox>()) }
 
     NavHost(navController = navController, startDestination = "resumen") {
         composable("resumen") {

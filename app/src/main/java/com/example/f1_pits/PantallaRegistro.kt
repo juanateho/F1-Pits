@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,9 +39,29 @@ fun PantallaListaPitStop(
     onSavePitStop: (ParadaEnBox) -> Unit
 ) {
     val equipos = mapOf(
+        "Mercedes" to listOf("Lewis Hamilton", "George Russell"),
+        "Red Bull Racing" to listOf("Max Verstappen", "Sergio Pérez"),
+        "Ferrari" to listOf("Charles Leclerc", "Carlos Sainz Jr."),
         "McLaren" to listOf("Lando Norris", "Oscar Piastri"),
-        "Red Bull" to listOf("Max Verstappen", "Sergio Pérez"),
-        "Ferrari" to listOf("Charles Leclerc", "Carlos Sainz Jr.")
+        "Aston Martin" to listOf("Fernando Alonso", "Lance Stroll"),
+        "Alpine" to listOf("Esteban Ocon", "Pierre Gasly"),
+        "Williams" to listOf("Alex Albon", "Logan Sargeant"),
+        "RB" to listOf("Yuki Tsunoda", "Daniel Ricciardo"),
+        "Sauber" to listOf("Valtteri Bottas", "Zhou Guanyu"),
+        "Haas" to listOf("Nico Hülkenberg", "Kevin Magnussen")
+    )
+
+    val mecanicosPrincipalesPorEscuderia = mapOf(
+        "Mercedes" to "Andrew Shovlin",
+        "Red Bull Racing" to "Adrian Newey",
+        "Ferrari" to "Jock Clear",
+        "McLaren" to "Andrea Stella",
+        "Aston Martin" to "Dan Fallows",
+        "Alpine" to "Matt Harman",
+        "Williams" to "Sven Smeets",
+        "RB" to "Jody Egginton",
+        "Sauber" to "James Key",
+        "Haas" to "Simone Resta"
     )
 
     var equipoSeleccionado by remember { mutableStateOf<String?>(null) }
@@ -86,6 +107,15 @@ fun PantallaListaPitStop(
         }
     }
 
+    LaunchedEffect(paradaAEditar == null) {
+        if (paradaAEditar == null) {
+            while (true) {
+                fechaHora = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+                delay(1000)
+            }
+        }
+    }
+
     Column(modifier = Modifier.padding(16.dp)) {
         // Equipo
         ExposedDropdownMenuBox(expanded = expandedEquipo, onExpandedChange = { expandedEquipo = !expandedEquipo }) {
@@ -102,6 +132,7 @@ fun PantallaListaPitStop(
                     DropdownMenuItem(text = { Text(equipo) }, onClick = {
                         equipoSeleccionado = equipo
                         pilotoSeleccionado = null // Reset driver selection
+                        mecanicoPrincipal = mecanicosPrincipalesPorEscuderia[equipo] ?: ""
                         expandedEquipo = false
                     })
                 }
@@ -179,10 +210,10 @@ fun PantallaListaPitStop(
             Spacer(modifier = Modifier.height(8.dp))
         }
 
-        TextField(value = mecanicoPrincipal, onValueChange = { mecanicoPrincipal = it }, label = { Text("Mecánico principal") }, modifier = Modifier.fillMaxWidth())
+        TextField(value = mecanicoPrincipal, onValueChange = { }, readOnly = true, label = { Text("Mecánico principal") }, modifier = Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.height(8.dp))
 
-        TextField(value = fechaHora, onValueChange = { fechaHora = it }, label = { Text("Fecha y hora del pit stop") }, modifier = Modifier.fillMaxWidth())
+        TextField(value = fechaHora, onValueChange = {}, readOnly = true, label = { Text("Fecha y hora del pit stop") }, modifier = Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.height(16.dp))
 
         Row(modifier = Modifier.fillMaxWidth()) {
@@ -195,7 +226,7 @@ fun PantallaListaPitStop(
                     neumaticosCambiados = neumaticosCambiados,
                     estado = estado,
                     motivoFallo = if (estado == EstadoParada.FALLIDO) motivoFallo else null,
-                    fechaHora = if(fechaHora.isBlank()) SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date()) else fechaHora,
+                    fechaHora = if(paradaAEditar != null) paradaAEditar.fechaHora else fechaHora,
                     mecanicoPrincipal = mecanicoPrincipal
                 )
                 onSavePitStop(paradaGuardada)
