@@ -3,6 +3,7 @@ package com.example.f1_pits
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -35,7 +37,8 @@ fun PantallaResumenPitStop(
     navController: NavController,
     totalPits: Int,
     fastestPit: Double?,
-    averageTime: Double
+    averageTime: Double,
+    paradas: List<ParadaEnBox>
 ) {
     Column(
         modifier = Modifier
@@ -77,7 +80,9 @@ fun PantallaResumenPitStop(
                 }
             }
         }
-        Spacer(modifier = Modifier.height(64.dp))
+        Spacer(modifier = Modifier.height(16.dp))
+        EscuderiaBarChart(paradas = paradas)
+        Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = { navController.navigate("registro") },
             modifier = Modifier
@@ -98,6 +103,61 @@ fun PantallaResumenPitStop(
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF333333))
         ) {
             Text(text = "Ver Listado", color = Color.White, fontSize = 16.sp)
+        }
+    }
+}
+
+@Composable
+fun EscuderiaBarChart(paradas: List<ParadaEnBox>) {
+    val teamColors = mapOf(
+        "Mercedes" to Color(0xFF00D2BE),
+        "Red Bull" to Color(0xFF0600EF),
+        "Ferrari" to Color(0xFFDC0000),
+        "McLaren" to Color(0xFFFF8700),
+        "Alpine" to Color(0xFF0090FF),
+        "Aston Martin" to Color(0xFF006F62),
+        "Williams" to Color(0xFF005AFF),
+        "Haas" to Color(0xFFFFFFFF),
+        "AlphaTauri" to Color(0xFF2B4562),
+        "Alfa Romeo" to Color(0xFF900000)
+    )
+
+    val teamTimes = paradas.groupBy { it.equipo }
+        .mapValues { entry -> entry.value.sumOf { it.tiempoPit } }
+
+    val maxTime = teamTimes.values.maxOrNull() ?: 1.0
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White, shape = RoundedCornerShape(12.dp))
+            .padding(16.dp)
+    ) {
+        Text("Tiempos totales por escudería", fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
+        teamTimes.forEach { (team, time) ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(team, modifier = Modifier.weight(1f))
+                Box(
+                    modifier = Modifier
+                        .weight(2f)
+                        .height(20.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(Color.LightGray)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth((time / maxTime).toFloat())
+                            .height(20.dp)
+                            .background(teamColors[team] ?: Color.Gray)
+                    )
+                }
+                Text(String.format("%.2f", time), modifier = Modifier.padding(start = 8.dp))
+            }
         }
     }
 }

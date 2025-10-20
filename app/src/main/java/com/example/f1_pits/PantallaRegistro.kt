@@ -166,7 +166,17 @@ fun PantallaRegistroPitStop(
         CustomOutlinedDropdown(label = "PILOTO", selectedItem = pilotoSeleccionado, items = equipos[equipoSeleccionado] ?: emptyList(), onItemSelected = { pilotoSeleccionado = it }, expanded = expandedPiloto, onExpandedChange = { expandedPiloto = it }, enabled = equipoSeleccionado != null)
         Spacer(modifier = Modifier.height(16.dp))
 
-        CustomOutlinedTextField(value = tiempoPit, onValueChange = { tiempoPit = it }, label = "TIEMPO TOTAL (S)", keyboardType = KeyboardType.Number)
+        CustomOutlinedTextField(
+            value = tiempoPit,
+            onValueChange = { newValue ->
+                val filtered = newValue.filter { it.isDigit() || it == '.' }
+                if (filtered.count { it == '.' } <= 1) {
+                    tiempoPit = filtered
+                }
+            },
+            label = "TIEMPO TOTAL (S)",
+            keyboardType = KeyboardType.Number
+        )
         Spacer(modifier = Modifier.height(16.dp))
 
         // Cambio de Neumáticos

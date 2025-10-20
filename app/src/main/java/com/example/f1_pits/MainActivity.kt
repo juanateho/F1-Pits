@@ -1,6 +1,7 @@
 package com.example.f1_pits
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -41,7 +42,8 @@ fun AppNavigation() {
                 navController = navController,
                 totalPits = totalPits,
                 fastestPit = fastestPit,
-                averageTime = if (averageTime.isNaN()) 0.0 else averageTime
+                averageTime = if (averageTime.isNaN()) 0.0 else averageTime,
+                paradas = paradasEnBox.value
             )
         }
         composable("lista") {
@@ -76,15 +78,24 @@ fun AppNavigation() {
             PantallaRegistroPitStop(
                 paradaAEditar = paradaAEditar,
                 onSavePitStop = { parada ->
-                    if (paradaAEditar == null) { // Creando
-                        val newId = (paradasEnBox.value.maxOfOrNull { it.id } ?: 0) + 1
-                        val paradaConId = parada.copy(id = newId)
-                        pitStopRepository.guardarPitStop(paradaConId)
-                    } else { // Editando
-                        pitStopRepository.editarPitStop(parada)
+                    val isValid = parada.nombrePiloto.isNotBlank() &&
+                            parada.equipo.isNotBlank() &&
+                            parada.tiempoPit > 0.0 &&
+                            (parada.estado != EstadoParada.FALLIDO || !parada.motivoFallo.isNullOrBlank())
+
+                    if (isValid) {
+                        if (paradaAEditar == null) { // Creando
+                            val newId = (paradasEnBox.value.maxOfOrNull { it.id } ?: 0) + 1
+                            val paradaConId = parada.copy(id = newId)
+                            pitStopRepository.guardarPitStop(paradaConId)
+                        } else { // Editando
+                            pitStopRepository.editarPitStop(parada)
+                        }
+                        paradasEnBox.value = pitStopRepository.obtenerTodosLosPitStops()
+                        navController.popBackStack()
+                    } else {
+                        Toast.makeText(context, "Debes completar todos los campos para guardar", Toast.LENGTH_LONG).show()
                     }
-                    paradasEnBox.value = pitStopRepository.obtenerTodosLosPitStops()
-                    navController.popBackStack()
                 },
                 onCancel = { navController.popBackStack() }
             )

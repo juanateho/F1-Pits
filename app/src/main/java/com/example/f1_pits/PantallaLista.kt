@@ -100,7 +100,7 @@ fun PantallaListaPitStop(
                         Text("Piloto", modifier = Modifier.weight(2f), fontWeight = FontWeight.Bold)
                         Text("Escudería", modifier = Modifier.weight(1.5f), fontWeight = FontWeight.Bold)
                         Text("Tiempo (s)", modifier = Modifier.weight(1f), fontWeight = FontWeight.Bold)
-                        Text("Estado", modifier = Modifier.weight(1f), fontWeight = FontWeight.Bold)
+                        Text("Estado", modifier = Modifier.weight(1f), fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
                         Text("Acciones", modifier = Modifier.weight(1.5f), fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
                     }
                 }
@@ -124,7 +124,8 @@ fun PantallaListaPitStop(
                                     if (parada.estado == EstadoParada.OK) Color(0xFFC8E6C9) else Color(0xFFFFCDD2),
                                     shape = RoundedCornerShape(4.dp)
                                 )
-                                .padding(horizontal = 4.dp, vertical = 2.dp)
+                                .padding(horizontal = 4.dp, vertical = 2.dp),
+                            textAlign = TextAlign.Center
                         )
                         Row(modifier = Modifier.weight(1.5f), horizontalArrangement = Arrangement.Center) {
                             IconButton(onClick = { onEditPitStop(parada.id) }) {
