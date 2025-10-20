@@ -1,7 +1,9 @@
 
 package com.example.f1_pits
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,7 +12,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -20,7 +24,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.RadioButton
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -32,7 +36,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -165,15 +171,23 @@ fun PantallaRegistroPitStop(
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            val neumaticoAImagen = mapOf(
+                TipoNeumatico.BLANDO to R.drawable.soft,
+                TipoNeumatico.MEDIO to R.drawable.medium,
+                TipoNeumatico.DURO to R.drawable.hard,
+                TipoNeumatico.INTERMEDIO to R.drawable.intermediate,
+                TipoNeumatico.LLUVIA to R.drawable.wet
+            )
+
             TipoNeumatico.values().forEach { tipo ->
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text(text = tipo.displayName)
-                    RadioButton(
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    val imagenId = neumaticoAImagen[tipo]!!
+                    ImagenRadioButton(
                         selected = neumaticos == tipo,
-                        onClick = { neumaticos = tipo }
+                        onClick = { neumaticos = tipo },
+                        imagenId = imagenId
                     )
+                    Text(text = tipo.displayName, fontSize = 12.sp)
                 }
             }
         }
@@ -221,6 +235,32 @@ fun PantallaRegistroPitStop(
         }
     }
 }
+
+@Composable
+fun ImagenRadioButton(
+    selected: Boolean,
+    onClick: () -> Unit,
+    imagenId: Int,
+    modifier: Modifier = Modifier
+) {
+    val borderModifier = if (selected) {
+        Modifier.border(2.dp, Color(0xFF6A1B9A), CircleShape)
+    } else {
+        Modifier
+    }
+
+    IconButton(onClick = onClick, modifier = modifier) {
+        Image(
+            painter = painterResource(id = imagenId),
+            contentDescription = null, // La descripción es decorativa
+            modifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape)
+                .then(borderModifier)
+        )
+    }
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
