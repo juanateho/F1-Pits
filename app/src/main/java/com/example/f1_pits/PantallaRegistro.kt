@@ -3,8 +3,8 @@ package com.example.f1_pits
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -43,6 +44,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -180,15 +185,13 @@ fun PantallaRegistroPitStop(
             )
 
             TipoNeumatico.values().forEach { tipo ->
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    val imagenId = neumaticoAImagen[tipo]!!
-                    ImagenRadioButton(
-                        selected = neumaticos == tipo,
-                        onClick = { neumaticos = tipo },
-                        imagenId = imagenId
-                    )
-                    Text(text = tipo.displayName, fontSize = 12.sp)
-                }
+                val imagenId = neumaticoAImagen[tipo]!!
+                AnimatableImagenRadioButton(
+                    selected = neumaticos == tipo,
+                    onClick = { neumaticos = tipo },
+                    imagenId = imagenId,
+                    displayName = tipo.displayName
+                )
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
@@ -237,27 +240,49 @@ fun PantallaRegistroPitStop(
 }
 
 @Composable
-fun ImagenRadioButton(
+fun AnimatableImagenRadioButton(
     selected: Boolean,
     onClick: () -> Unit,
     imagenId: Int,
+    displayName: String,
     modifier: Modifier = Modifier
 ) {
-    val borderModifier = if (selected) {
-        Modifier.border(2.dp, Color(0xFF6A1B9A), CircleShape)
-    } else {
-        Modifier
-    }
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.smoke))
+    val progress by animateLottieCompositionAsState(
+        composition,
+        isPlaying = selected,
+        restartOnPlay = true,
+        iterations = 1
+    )
 
-    IconButton(onClick = onClick, modifier = modifier) {
-        Image(
-            painter = painterResource(id = imagenId),
-            contentDescription = null, // La descripción es decorativa
-            modifier = Modifier
-                .size(48.dp)
-                .clip(CircleShape)
-                .then(borderModifier)
-        )
+    Column(
+        modifier = modifier.width(80.dp), // Solución 1: Ancho fijo para simetría
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Box(
+            modifier = Modifier.size(80.dp), // Solución 2: Tamaño reducido y consistente
+            contentAlignment = Alignment.Center
+        ) {
+            IconButton(onClick = onClick, modifier = Modifier.size(52.dp)) {
+                Image(
+                    painter = painterResource(id = imagenId),
+                    contentDescription = displayName,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(CircleShape)
+                )
+            }
+
+            if (progress > 0f && progress < 1f) {
+                LottieAnimation(
+                    composition = composition,
+                    progress = { progress },
+                    modifier = Modifier.size(80.dp) // Solución 2: Tamaño reducido y consistente
+                )
+            }
+        }
+        Text(text = displayName, fontSize = 12.sp)
     }
 }
 
