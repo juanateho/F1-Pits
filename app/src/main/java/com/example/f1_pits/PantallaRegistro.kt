@@ -1,15 +1,21 @@
 
 package com.example.f1_pits
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -17,6 +23,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -25,8 +32,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -34,9 +44,10 @@ import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PantallaListaPitStop(
+fun PantallaRegistroPitStop(
     paradaAEditar: ParadaEnBox?,
-    onSavePitStop: (ParadaEnBox) -> Unit
+    onSavePitStop: (ParadaEnBox) -> Unit,
+    onCancel: () -> Unit
 ) {
     val equipos = mapOf(
         "Mercedes" to listOf("Lewis Hamilton", "George Russell"),
@@ -76,7 +87,7 @@ fun PantallaListaPitStop(
 
     var expandedEquipo by remember { mutableStateOf(false) }
     var expandedPiloto by remember { mutableStateOf(false) }
-    var expandedNeumaticos by remember { mutableStateOf(false) }
+    var expandedNumNeumaticos by remember { mutableStateOf(false) }
     var expandedEstado by remember { mutableStateOf(false) }
 
     fun limpiarCampos() {
@@ -110,114 +121,85 @@ fun PantallaListaPitStop(
     LaunchedEffect(paradaAEditar == null) {
         if (paradaAEditar == null) {
             while (true) {
-                fechaHora = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+                fechaHora = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date())
                 delay(1000)
             }
         }
     }
 
-    Column(modifier = Modifier.padding(16.dp)) {
-        // Equipo
-        ExposedDropdownMenuBox(expanded = expandedEquipo, onExpandedChange = { expandedEquipo = !expandedEquipo }) {
-            TextField(
-                value = equipoSeleccionado ?: "",
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Escudería") },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedEquipo) },
-                modifier = Modifier.menuAnchor().fillMaxWidth()
-            )
-            ExposedDropdownMenu(expanded = expandedEquipo, onDismissRequest = { expandedEquipo = false }) {
-                equipos.keys.forEach { equipo ->
-                    DropdownMenuItem(text = { Text(equipo) }, onClick = {
-                        equipoSeleccionado = equipo
-                        pilotoSeleccionado = null // Reset driver selection
-                        mecanicoPrincipal = mecanicosPrincipalesPorEscuderia[equipo] ?: ""
-                        expandedEquipo = false
-                    })
-                }
-            }
-        }
-        Spacer(modifier = Modifier.height(8.dp))
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF0F0F0))
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = if (paradaAEditar == null) "Registrar Pit Stop" else "Editar Pit Stop",
+            fontSize = 32.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
 
-        // Piloto
-        ExposedDropdownMenuBox(expanded = expandedPiloto, onExpandedChange = { expandedPiloto = !expandedPiloto }) {
-            TextField(
-                value = pilotoSeleccionado ?: "",
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Piloto") },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedPiloto) },
-                modifier = Modifier.menuAnchor().fillMaxWidth(),
-                enabled = equipoSeleccionado != null
-            )
-            ExposedDropdownMenu(expanded = expandedPiloto, onDismissRequest = { expandedPiloto = false }) {
-                equipos[equipoSeleccionado]?.forEach { piloto ->
-                    DropdownMenuItem(text = { Text(piloto) }, onClick = {
-                        pilotoSeleccionado = piloto
-                        expandedPiloto = false
-                    })
-                }
-            }
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-
-        TextField(value = tiempoPit, onValueChange = { tiempoPit = it }, label = { Text("Tiempo total") }, placeholder = { Text("0.000") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth())
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text("Cambio de neumáticos:")
-        Row(modifier = Modifier.fillMaxWidth()) {
-            TipoNeumatico.values().forEach { tipo ->
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    RadioButton(selected = neumaticos == tipo, onClick = { neumaticos = tipo })
-                    Text(text = tipo.displayName)
-                }
-            }
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Neumaticos Cambiados y Estado en la misma fila
-        Row(modifier=Modifier.fillMaxWidth()){
-            ExposedDropdownMenuBox(expanded = expandedNeumaticos, onExpandedChange = { expandedNeumaticos = !expandedNeumaticos }, modifier=Modifier.weight(1f)) {
-                TextField(value = neumaticosCambiados.toString(), onValueChange = {}, readOnly = true, label = { Text("Neumáticos") }, modifier = Modifier.menuAnchor(), trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedNeumaticos) })
-                ExposedDropdownMenu(expanded = expandedNeumaticos, onDismissRequest = { expandedNeumaticos = false }) {
-                    (1..4).forEach { num ->
-                        DropdownMenuItem(text = { Text(num.toString()) }, onClick = {
-                            neumaticosCambiados = num
-                            expandedNeumaticos = false
-                        })
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.width(8.dp))
-            ExposedDropdownMenuBox(expanded = expandedEstado, onExpandedChange = { expandedEstado = !expandedEstado }, modifier=Modifier.weight(1f)) {
-                TextField(value = estado.displayName, onValueChange = {}, readOnly = true, label = { Text("Estado") }, modifier = Modifier.menuAnchor(), trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedEstado) })
-                ExposedDropdownMenu(expanded = expandedEstado, onDismissRequest = { expandedEstado = false }) {
-                    EstadoParada.values().forEach { est ->
-                        DropdownMenuItem(text = { Text(est.displayName) }, onClick = {
-                            estado = est
-                            expandedEstado = false
-                        })
-                    }
-                }
-            }
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-
-
-        if (estado == EstadoParada.FALLIDO) {
-            TextField(value = motivoFallo, onValueChange = { motivoFallo = it }, label = { Text("Motivo del fallo") }, modifier = Modifier.fillMaxWidth())
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-
-        TextField(value = mecanicoPrincipal, onValueChange = { }, readOnly = true, label = { Text("Mecánico principal") }, modifier = Modifier.fillMaxWidth())
-        Spacer(modifier = Modifier.height(8.dp))
-
-        TextField(value = fechaHora, onValueChange = {}, readOnly = true, label = { Text("Fecha y hora del pit stop") }, modifier = Modifier.fillMaxWidth())
+        // Escudería
+        CustomOutlinedDropdown(label = "ESCUDERÍA", selectedItem = equipoSeleccionado, items = equipos.keys.toList(), onItemSelected = { 
+            equipoSeleccionado = it
+            pilotoSeleccionado = null // Reset driver selection
+            mecanicoPrincipal = mecanicosPrincipalesPorEscuderia[it] ?: ""
+         }, expanded = expandedEquipo, onExpandedChange = { expandedEquipo = it })
         Spacer(modifier = Modifier.height(16.dp))
 
-        Row(modifier = Modifier.fillMaxWidth()) {
-            Button(onClick = {
+        // Piloto
+        CustomOutlinedDropdown(label = "PILOTO", selectedItem = pilotoSeleccionado, items = equipos[equipoSeleccionado] ?: emptyList(), onItemSelected = { pilotoSeleccionado = it }, expanded = expandedPiloto, onExpandedChange = { expandedPiloto = it }, enabled = equipoSeleccionado != null)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        CustomOutlinedTextField(value = tiempoPit, onValueChange = { tiempoPit = it }, label = "TIEMPO TOTAL (S)", keyboardType = KeyboardType.Number)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Cambio de Neumáticos
+        Text(text = "CAMBIO DE NEUMÁTICOS", fontSize = 12.sp, color = Color.Gray, modifier = Modifier.padding(bottom = 4.dp).fillMaxWidth())
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceAround,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TipoNeumatico.values().forEach { tipo ->
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(text = tipo.displayName)
+                    RadioButton(
+                        selected = neumaticos == tipo,
+                        onClick = { neumaticos = tipo }
+                    )
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Numero de Neumáticos y Estado
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)){
+            CustomOutlinedDropdown(label = "NUMERO DE NEUMÁTICOS CAMBIADOS", selectedItem = neumaticosCambiados.toString(), items = (0..4).map { it.toString() }, onItemSelected = { neumaticosCambiados = it.toInt() }, expanded = expandedNumNeumaticos, onExpandedChange = { expandedNumNeumaticos = it }, modifier = Modifier.weight(1f))
+            CustomOutlinedDropdown(label = "ESTADO", selectedItem = estado.displayName, items = EstadoParada.values().map { it.displayName }, onItemSelected = { selectedName -> estado = EstadoParada.values().first { it.displayName == selectedName }}, expanded = expandedEstado, onExpandedChange = { expandedEstado = it }, modifier = Modifier.weight(1f))
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        if (estado == EstadoParada.FALLIDO) {
+            CustomOutlinedTextField(value = motivoFallo, onValueChange = { motivoFallo = it }, label = "MOTIVO DEL FALLO")
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
+        // Mecánico y Fecha
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)){
+            CustomOutlinedTextField(value = mecanicoPrincipal, onValueChange = {}, label = "MECÁNICO PRINCIPAL", readOnly = true, modifier = Modifier.weight(1f))
+            CustomOutlinedTextField(value = fechaHora, onValueChange = {}, label = "FECHA Y HORA DEL PIT STOP", readOnly = true, modifier = Modifier.weight(1f))
+        }
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Button(onClick = { 
                 val paradaGuardada = (paradaAEditar ?: ParadaEnBox(0, "", "", 0.0, TipoNeumatico.BLANDO, 0, EstadoParada.OK, null, "", "")).copy(
                     nombrePiloto = pilotoSeleccionado ?: "",
                     equipo = equipoSeleccionado ?: "",
@@ -229,14 +211,85 @@ fun PantallaListaPitStop(
                     fechaHora = if(paradaAEditar != null) paradaAEditar.fechaHora else fechaHora,
                     mecanicoPrincipal = mecanicoPrincipal
                 )
-                onSavePitStop(paradaGuardada)
-            }, modifier = Modifier.weight(1f)) {
-                Text(if (paradaAEditar == null) "Guardar Pit" else "Actualizar Pit")
+                onSavePitStop(paradaGuardada) 
+            }, modifier = Modifier.weight(1f).height(50.dp), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6A1B9A)), shape = RoundedCornerShape(12.dp)) {
+                Text(if (paradaAEditar == null) "GUARDAR" else "ACTUALIZAR", color = Color.White)
             }
-            Spacer(modifier = Modifier.width(8.dp))
-            Button(onClick = { limpiarCampos() }, modifier = Modifier.weight(1f)) {
-                Text("Limpiar Campos")
+            Button(onClick = onCancel, modifier = Modifier.weight(1f).height(50.dp), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF333333)), shape = RoundedCornerShape(12.dp)) {
+                Text("CANCELAR", color = Color.White)
             }
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CustomOutlinedDropdown(
+    label: String,
+    selectedItem: String?,
+    items: List<String>,
+    onItemSelected: (String) -> Unit,
+    expanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
+) {
+    Column(modifier = modifier) {
+        Text(text = label, fontSize = 12.sp, color = Color.Gray, modifier = Modifier.padding(bottom = 4.dp))
+        ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = onExpandedChange) {
+            TextField(
+                value = selectedItem ?: "",
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                modifier = Modifier.menuAnchor().fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White,
+                    disabledContainerColor = Color.White,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                ),
+                enabled = enabled
+            )
+            ExposedDropdownMenu(expanded = expanded, onDismissRequest = { onExpandedChange(false) }) {
+                items.forEach { item ->
+                    DropdownMenuItem(text = { Text(item) }, onClick = {
+                        onItemSelected(item)
+                        onExpandedChange(false)
+                    })
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CustomOutlinedTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    modifier: Modifier = Modifier,
+    readOnly: Boolean = false,
+    keyboardType: KeyboardType = KeyboardType.Text
+) {
+    Column(modifier = modifier) {
+        Text(text = label, fontSize = 12.sp, color = Color.Gray, modifier = Modifier.padding(bottom = 4.dp))
+        TextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier.fillMaxWidth(),
+            readOnly = readOnly,
+            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+            shape = RoundedCornerShape(8.dp),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color.White,
+                unfocusedContainerColor = Color.White,
+                disabledContainerColor = Color.White,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            )
+        )
     }
 }

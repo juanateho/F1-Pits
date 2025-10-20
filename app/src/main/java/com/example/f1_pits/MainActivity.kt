@@ -5,7 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
@@ -45,36 +44,11 @@ fun AppNavigation() {
                 averageTime = if (averageTime.isNaN()) 0.0 else averageTime
             )
         }
-        composable(
-            "lista?pitStopId={pitStopId}",
-            arguments = listOf(navArgument("pitStopId") {
-                type = NavType.StringType
-                nullable = true
-            })
-        ) { backStackEntry ->
-            val pitStopId = backStackEntry.arguments?.getString("pitStopId")?.toIntOrNull()
-            val paradaAEditar = paradasEnBox.value.find { it.id == pitStopId }
-
+        composable("lista") {
             PantallaListaPitStop(
-                paradaAEditar = paradaAEditar,
-                onSavePitStop = { parada ->
-                    if (paradaAEditar == null) { // Creando
-                        val newId = (paradasEnBox.value.maxOfOrNull { it.id } ?: 0) + 1
-                        val paradaConId = parada.copy(id = newId)
-                        pitStopRepository.guardarPitStop(paradaConId)
-                    } else { // Editando
-                        pitStopRepository.editarPitStop(parada)
-                    }
-                    paradasEnBox.value = pitStopRepository.obtenerTodosLosPitStops()
-                    navController.popBackStack()
-                }
-            )
-        }
-        composable("registro") {
-            PantallaRegistroPitStop(
                 paradas = paradasEnBox.value,
                 onEditPitStop = { pitStopId ->
-                    navController.navigate("lista?pitStopId=$pitStopId")
+                    navController.navigate("registro?pitStopId=$pitStopId")
                 },
                 onDeletePitStop = { pitStopId ->
                     pitStopRepository.eliminarPitStop(pitStopId)
@@ -87,6 +61,32 @@ fun AppNavigation() {
                         pitStopRepository.buscarPitStop(query)
                     }
                 }
+            )
+        }
+        composable(
+            "registro?pitStopId={pitStopId}",
+            arguments = listOf(navArgument("pitStopId") {
+                type = NavType.StringType
+                nullable = true
+            })
+        ) { backStackEntry ->
+            val pitStopId = backStackEntry.arguments?.getString("pitStopId")?.toIntOrNull()
+            val paradaAEditar = paradasEnBox.value.find { it.id == pitStopId }
+
+            PantallaRegistroPitStop(
+                paradaAEditar = paradaAEditar,
+                onSavePitStop = { parada ->
+                    if (paradaAEditar == null) { // Creando
+                        val newId = (paradasEnBox.value.maxOfOrNull { it.id } ?: 0) + 1
+                        val paradaConId = parada.copy(id = newId)
+                        pitStopRepository.guardarPitStop(paradaConId)
+                    } else { // Editando
+                        pitStopRepository.editarPitStop(parada)
+                    }
+                    paradasEnBox.value = pitStopRepository.obtenerTodosLosPitStops()
+                    navController.popBackStack()
+                },
+                onCancel = { navController.popBackStack() }
             )
         }
     }
