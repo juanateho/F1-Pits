@@ -53,7 +53,7 @@ fun PantallaListaPitStop(
             .background(Color(0xFFF0F0F0))
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Top
     ) {
         Text(
             text = "Listado de Pit Stops",
@@ -61,7 +61,6 @@ fun PantallaListaPitStop(
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 16.dp)
         )
-
         TextField(
             value = searchQuery,
             onValueChange = {
@@ -84,7 +83,9 @@ fun PantallaListaPitStop(
         Spacer(modifier = Modifier.height(16.dp))
 
         Card(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
             shape = RoundedCornerShape(12.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White)

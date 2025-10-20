@@ -111,14 +111,14 @@ fun PantallaResumenPitStop(
 fun EscuderiaBarChart(paradas: List<ParadaEnBox>) {
     val teamColors = mapOf(
         "Mercedes" to Color(0xFF00D2BE),
-        "Red Bull" to Color(0xFF0600EF),
+        "Red Bull" to Color(0xFFFFC700),
         "Ferrari" to Color(0xFFDC0000),
         "McLaren" to Color(0xFFFF8700),
         "Alpine" to Color(0xFF0090FF),
         "Aston Martin" to Color(0xFF006F62),
-        "Williams" to Color(0xFF005AFF),
-        "Haas" to Color(0xFFFFFFFF),
-        "AlphaTauri" to Color(0xFF2B4562),
+        "Williams" to Color(0xFF00A0DE),
+        "Haas" to Color(0xFFB0B0B0),
+        "AlphaTauri" to Color(0xFFC1D4E9),
         "Alfa Romeo" to Color(0xFF900000)
     )
 
