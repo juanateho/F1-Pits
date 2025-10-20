@@ -5,8 +5,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -26,7 +28,9 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
-    val paradasEnBox = remember { mutableStateOf(emptyList<ParadaEnBox>()) }
+    val context = LocalContext.current
+    val pitStopRepository = remember { PitStopRepository(context) }
+    val paradasEnBox = remember { mutableStateOf(pitStopRepository.obtenerTodosLosPitStops()) }
 
     NavHost(navController = navController, startDestination = "resumen") {
         composable("resumen") {
@@ -55,11 +59,13 @@ fun AppNavigation() {
                 paradaAEditar = paradaAEditar,
                 onSavePitStop = { parada ->
                     if (paradaAEditar == null) { // Creando
-                        val paradaConId = parada.copy(id = (paradasEnBox.value.maxOfOrNull { it.id } ?: 0) + 1)
-                        paradasEnBox.value = paradasEnBox.value + paradaConId
+                        val newId = (paradasEnBox.value.maxOfOrNull { it.id } ?: 0) + 1
+                        val paradaConId = parada.copy(id = newId)
+                        pitStopRepository.guardarPitStop(paradaConId)
                     } else { // Editando
-                        paradasEnBox.value = paradasEnBox.value.map { if (it.id == parada.id) parada else it }
+                        pitStopRepository.editarPitStop(parada)
                     }
+                    paradasEnBox.value = pitStopRepository.obtenerTodosLosPitStops()
                     navController.popBackStack()
                 }
             )
@@ -71,7 +77,15 @@ fun AppNavigation() {
                     navController.navigate("lista?pitStopId=$pitStopId")
                 },
                 onDeletePitStop = { pitStopId ->
-                    paradasEnBox.value = paradasEnBox.value.filter { it.id != pitStopId }
+                    pitStopRepository.eliminarPitStop(pitStopId)
+                    paradasEnBox.value = pitStopRepository.obtenerTodosLosPitStops()
+                },
+                onSearchPitStop = { query ->
+                    paradasEnBox.value = if (query.isBlank()) {
+                        pitStopRepository.obtenerTodosLosPitStops()
+                    } else {
+                        pitStopRepository.buscarPitStop(query)
+                    }
                 }
             )
         }
