@@ -208,7 +208,7 @@ fun PantallaRegistroPitStop(
 
         // Numero de Neumáticos y Estado
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)){
-            CustomOutlinedDropdown(label = "NUMERO DE NEUMÁTICOS CAMBIADOS", selectedItem = neumaticosCambiados.toString(), items = (0..4).map { it.toString() }, onItemSelected = { neumaticosCambiados = it.toInt() }, expanded = expandedNumNeumaticos, onExpandedChange = { expandedNumNeumaticos = it }, modifier = Modifier.weight(1f))
+            CustomOutlinedDropdown(label = "# NEUMÁTICOS CAMBIADOS", selectedItem = neumaticosCambiados.toString(), items = (0..4).map { it.toString() }, onItemSelected = { neumaticosCambiados = it.toInt() }, expanded = expandedNumNeumaticos, onExpandedChange = { expandedNumNeumaticos = it }, modifier = Modifier.weight(1f))
             CustomOutlinedDropdown(label = "ESTADO", selectedItem = estado.displayName, items = EstadoParada.values().map { it.displayName }, onItemSelected = { selectedName -> estado = EstadoParada.values().first { it.displayName == selectedName }}, expanded = expandedEstado, onExpandedChange = { expandedEstado = it }, modifier = Modifier.weight(1f))
         }
         Spacer(modifier = Modifier.height(16.dp))

@@ -59,7 +59,7 @@ fun PantallaListaPitStop(
             text = "Listado de Pit Stops",
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 16.dp, top = 48.dp)
         )
         TextField(
             value = searchQuery,
