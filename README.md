@@ -2,15 +2,12 @@
 
 [![Kotlin Badge](https://img.shields.io/badge/Language-Kotlin-blue.svg)](https://kotlinlang.org/)
 [![Platform Badge](https://img.shields.io/badge/Platform-Android-green.svg)](https://developer.android.com/)
-[![License Badge](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ## 📝 Descripción del Proyecto
 
 **F1-Pits** es una aplicación móvil para **Android** desarrollada en **Kotlin** que se centra en **el análisis y visualización de datos históricos y en tiempo real sobre las paradas en boxes (*pit stops*) de la Fórmula 1**.
 
-El objetivo principal es ofrecer una herramienta **rápida y visual** para que los aficionados y entusiastas de la F1 puedan **consultar la evolución de los tiempos de *pit stop***, **comparar el rendimiento entre equipos** y **entender cómo una parada influye en la estrategia de carrera**. Además, incluye una **simulación interactiva** para [**EXPLICAR FUNCIONALIDAD DE SIMULACIÓN/ANÁLISIS ÚNICA**].
-
----
+El objetivo principal es ofrecer una herramienta **rápida y visual** para que los aficionados y entusiastas de la F1 puedan **consultar la evolución de los tiempos de *pit stop***, **comparar el rendimiento entre equipos** y **entender cómo una parada influye en la estrategia de carrera**.
 
 ---
 
@@ -18,10 +15,9 @@ El objetivo principal es ofrecer una herramienta **rápida y visual** para que l
 
 Aquí tienes una lista de las principales funcionalidades que ofrece o que se planean para la aplicación:
 
-* [**ACTUALIZA ESTA LISTA CON TUS CARACTERÍSTICAS REALES**]
-* **Tiempos Históricos:** Visualización y filtrado de los *pit stops* más rápidos de la historia de la F1.
-* **Análisis por Equipo:** Gráficos y estadísticas del rendimiento en *pit stops* por equipo y por temporada.
-* **Interfaz Intuitiva:** Diseño limpio y moderno, siguiendo las directrices de diseño de Android (posiblemente con Jetpack Compose).
+* **Tiempos Históricos:** Visualización y filtrado de los *pit stops*.
+* **Análisis por Equipo:** Gráficos y estadísticas del rendimiento en *pit stops* por equipo.
+* **Interfaz Intuitiva:** Diseño limpio y moderno, siguiendo las directrices de diseño de Android.
 
 ---
 
