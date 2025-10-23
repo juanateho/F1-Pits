@@ -70,7 +70,7 @@ fun PantallaRegistroPitStop(
         "Williams" to listOf("Alex Albon", "Logan Sargeant"),
         "RB" to listOf("Yuki Tsunoda", "Daniel Ricciardo"),
         "Sauber" to listOf("Valtteri Bottas", "Zhou Guanyu"),
-        "Haas" to listOf("Nico Hülkenberg", "Kevin Magnussen")
+        "Haas" to listOf("Nico Hülkenberg", "Kevin Magnussen"),
     )
 
     val mecanicosPrincipalesPorEscuderia = mapOf(
@@ -83,7 +83,7 @@ fun PantallaRegistroPitStop(
         "Williams" to "Sven Smeets",
         "RB" to "Jody Egginton",
         "Sauber" to "James Key",
-        "Haas" to "Simone Resta"
+        "Haas" to "Simone Resta",
     )
 
     var equipoSeleccionado by remember { mutableStateOf<String?>(null) }
@@ -183,7 +183,6 @@ fun PantallaRegistroPitStop(
         Text(text = "CAMBIO DE NEUMÁTICOS", fontSize = 12.sp, color = Color.Gray, modifier = Modifier.padding(bottom = 4.dp).fillMaxWidth())
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
             val neumaticoAImagen = mapOf(
@@ -200,7 +199,8 @@ fun PantallaRegistroPitStop(
                     selected = neumaticos == tipo,
                     onClick = { neumaticos = tipo },
                     imagenId = imagenId,
-                    displayName = tipo.displayName
+                    displayName = tipo.displayName,
+                    modifier = Modifier.weight(1f)
                 )
             }
         }
@@ -266,12 +266,12 @@ fun AnimatableImagenRadioButton(
     )
 
     Column(
-        modifier = modifier.width(80.dp), // Solución 1: Ancho fijo para simetría
+        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Box(
-            modifier = Modifier.size(80.dp), // Solución 2: Tamaño reducido y consistente
+            modifier = Modifier.size(70.dp),
             contentAlignment = Alignment.Center
         ) {
             IconButton(onClick = onClick, modifier = Modifier.size(52.dp)) {
@@ -288,7 +288,7 @@ fun AnimatableImagenRadioButton(
                 LottieAnimation(
                     composition = composition,
                     progress = { progress },
-                    modifier = Modifier.size(80.dp) // Solución 2: Tamaño reducido y consistente
+                    modifier = Modifier.size(120.dp)
                 )
             }
         }

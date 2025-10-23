@@ -110,16 +110,16 @@ fun PantallaResumenPitStop(
 @Composable
 fun EscuderiaBarChart(paradas: List<ParadaEnBox>) {
     val teamColors = mapOf(
-        "Mercedes" to Color(0xFF00D2BE),
-        "Red Bull" to Color(0xFFFFC700),
-        "Ferrari" to Color(0xFFDC0000),
-        "McLaren" to Color(0xFFFF8700),
-        "Alpine" to Color(0xFF0090FF),
-        "Aston Martin" to Color(0xFF006F62),
-        "Williams" to Color(0xFF00A0DE),
-        "Haas" to Color(0xFFB0B0B0),
-        "AlphaTauri" to Color(0xFFC1D4E9),
-        "Alfa Romeo" to Color(0xFF900000)
+        "Mercedes" to Color(0xFF00D7B6),
+        "Red Bull Racing" to Color(0xFF4781D7),
+        "Ferrari" to Color(0xFFED1131),
+        "McLaren" to Color(0xFFF47600),
+        "Alpine" to Color(0xFF00A1E8),
+        "RB" to Color(0xFF6C98FF),
+        "Aston Martin" to Color(0xFF229971),
+        "Williams" to Color(0xFF1868DB),
+        "Sauber" to Color(0xFF01C00E),
+        "Haas" to Color(0xFF9C9FA2)
     )
 
     val teamTimes = paradas.groupBy { it.equipo }
