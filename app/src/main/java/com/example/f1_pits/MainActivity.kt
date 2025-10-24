@@ -84,11 +84,11 @@ fun AppNavigation() {
                             (parada.estado != EstadoParada.FALLIDO || !parada.motivoFallo.isNullOrBlank())
 
                     if (isValid) {
-                        if (paradaAEditar == null) { // Creando
+                        if (paradaAEditar == null) {
                             val newId = (paradasEnBox.value.maxOfOrNull { it.id } ?: 0) + 1
                             val paradaConId = parada.copy(id = newId)
                             pitStopRepository.guardarPitStop(paradaConId)
-                        } else { // Editando
+                        } else {
                             pitStopRepository.editarPitStop(parada)
                         }
                         paradasEnBox.value = pitStopRepository.obtenerTodosLosPitStops()
